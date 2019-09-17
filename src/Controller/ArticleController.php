@@ -40,7 +40,6 @@ EOF;
             $cache->save($item);
         }
 
-        dd($cache);
         $articleContent = $item->get();
 
         return $this->render('article/show.html.twig', [
