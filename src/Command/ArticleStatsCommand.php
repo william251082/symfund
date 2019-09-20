@@ -18,7 +18,7 @@ class ArticleStatsCommand extends Command
         $this
             ->setDescription('Returns some article stats')
             ->addArgument('slug', InputArgument::REQUIRED, 'The article\'s slug')
-            ->addOption('format', null, InputOption::VALUE_OPTIONAL, 'The output format, text')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format, text')
         ;
     }
 
@@ -34,7 +34,11 @@ class ArticleStatsCommand extends Command
 
         switch ($input->getOption('format')) {
             case 'text':
-                $io->listing($data);
+                $rows = [];
+                foreach ($data as $key => $val) {
+                    $rows[] = [$key, $val];
+                }
+                $io->table(['Key', 'Value'], $rows);
                 break;
             case 'json':
                 $io->write(\GuzzleHttp\json_encode($data));
