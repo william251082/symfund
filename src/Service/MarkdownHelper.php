@@ -14,11 +14,18 @@ class MarkdownHelper
 
     private $logger;
 
-    public function __construct(AdapterInterface $cache, MarkdownInterface $markdown, LoggerInterface $markdownLogger)
+    private $isDebug;
+
+    public function __construct(
+        AdapterInterface $cache,
+        MarkdownInterface $markdown,
+        LoggerInterface $markdownLogger,
+        bool $isDebug)
     {
         $this->cache = $cache;
         $this->markdown = $markdown;
         $this->logger = $markdownLogger;
+        $this->isDebug = $isDebug;
     }
 
     public function parse(string $source): string
@@ -27,8 +34,16 @@ class MarkdownHelper
             $this->logger->info('They are talking bacon again!');
         }
 
+//        dd($this->cache); // Check which adapter is used
+
+        // skip caching entirely in debug
+        if ($this->isDebug) {
+            // return the uncached value
+            return $this->markdown->transform($source);
+        }
+
         $item = $this->cache->getItem('markdown_'.md5($source));
-        if ($item->isHit()) {
+        if (!$item->isHit()) {
             $item->set($this->markdown->transform($source));
             $this->cache->save($item);
         }
