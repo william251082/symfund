@@ -34,11 +34,7 @@ class MarkdownHelper
             $this->logger->info('They are talking bacon again!');
         }
 
-//        dd($this->cache); // Check which adapter is used
-
-        // skip caching entirely in debug
         if ($this->isDebug) {
-            // return the uncached value
             return $this->markdown->transform($source);
         }
 
