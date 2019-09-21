@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
-use App\Service\MarkdownHelper;
+use App\Entity\Article;
 use App\Service\SlackClient;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,27 +30,29 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show($slug, MarkdownHelper $markdownHelper, SlackClient $slack)
+    public function show($slug, SlackClient $slack, EntityManagerInterface $manager)
     {
         if ($slug == 'hii') {
             $slack->sendMessage('Wil', 'hoo');
         }
+
+        $repository = $manager->getRepository(Article::class);
+        /** @var Article $article */
+        $article = $repository->findOneBy(['slug' => $slug]);
+        if (!$article) {
+            throw $this->createNotFoundException(sprintf('No article for slug "%s', $slug));
+        }
+
+//        dd($article);
+
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
             'Woohoo! I\'m going on an all-asteroid diet!',
             'I like bacon too! Buy some from my site! bakinsomebacon.com',
         ];
 
-        $articleContent = <<<EOF
-Bacon ipsum dolor amet venison **landjaeger** ham hock, corned beef [pork chop](https://baconipsum.com/?paras=5&type=all-meat&start-with-lorem=1) rump **doner**. Frankfurter **brisket** pastrami tenderloin sirloin alcatra. Cupim tongue jerky pancetta. Tri-tip flank frankfurter ham hock pork chop, cupim shoulder landjaeger ball tip kielbasa corned beef pastrami burgdoggen. Pork belly tail frankfurter pancetta landjaeger salami beef ribs picanha. Meatloaf ham beef shankle burgdoggen flank, ribeye alcatra pork doner.
-EOF;
-
-        $articleContent = $markdownHelper->parse($articleContent);
-
         return $this->render('article/show.html.twig', [
-            'title' => ucwords(str_replace('-', ' ', $slug)),
-            'slug' => $slug,
-            'articleContent' => $articleContent,
+            'article' => $article,
             'comments' => $comments,
         ]);
     }
