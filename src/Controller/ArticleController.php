@@ -43,8 +43,6 @@ class ArticleController extends AbstractController
             throw $this->createNotFoundException(sprintf('No article for slug "%s', $slug));
         }
 
-//        dd($article);
-
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
             'Woohoo! I\'m going on an all-asteroid diet!',
