@@ -29,7 +29,6 @@ class ArticleFixtures extends BaseFixture
     {
         $this->createMany(Article::class, 10, function (Article $article) {
             $article->setTitle($this->faker->randomElement(self::$articleTitles))
-                ->setSlug($this->faker->slug)
                 ->setContent(<<<EOF
 Bacon ipsum dolor amet venison **landjaeger** ham hock, corned beef [pork chop](https://baconipsum.com/?paras=5&type=all-meat&start-with-lorem=1) rump **doner**. Frankfurter **brisket** pastrami tenderloin sirloin alcatra. Cupim tongue jerky pancetta. Tri-tip flank frankfurter ham hock pork chop, cupim shoulder landjaeger ball tip kielbasa corned beef pastrami burgdoggen. Pork belly tail frankfurter pancetta landjaeger salami beef ribs picanha. Meatloaf ham beef shankle burgdoggen flank, ribeye alcatra pork doner.
 EOF
