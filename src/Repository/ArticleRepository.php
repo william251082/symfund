@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
+use function GuzzleHttp\Promise\queue;
 
 /**
  * @method Article|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,21 +26,31 @@ class ArticleRepository extends ServiceEntityRepository
       */
     public function findAllPublishedOrderedByNewest()
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.publishedAt IS NOT NULL')
+         return $this->addIsPublishedQueryBuilder()
             ->orderBy('a.publishedAt', 'DESC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function findOneBySomeField($value): ?Article
+//    public function findOneBySomeField($value): ?Article
+//    {
+//        return $this->createQueryBuilder('a')
+//            ->andWhere('a.exampleField = :val')
+//            ->setParameter('val', $value)
+//            ->getQuery()
+//            ->getOneOrNullResult()
+//        ;
+//    }
+
+    private function addIsPublishedQueryBuilder(QueryBuilder $queryBuilder = null)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->getOrCreateQueryBuilder($queryBuilder)
+            ->andWhere('a.publishedAt IS NOT NULL');
+    }
+
+    private function getOrCreateQueryBuilder(QueryBuilder $queryBuilder = null)
+    {
+        return $queryBuilder ?: $this->createQueryBuilder('a');
     }
 }
